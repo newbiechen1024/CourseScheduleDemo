@@ -1,0 +1,162 @@
+(一)、项目简介
+模仿超级课程表的课程界面，制作利用OkHttp+Jsoup获取成大课程表的Demo
+基础架构：MVC框架
+
+(二)、制作流程与遇到的问题
+
+(1)、首先创建AndroidLib放置与主程序逻辑无关的类
+本人首先加入了BaseActivity类
+
+(2)、那么开始制作课程表的框框
+
+①、头部是一排表格。我们可以使用GridLayout、TableLayout、GridView及RecyclerView中的
+GridLayoutManager 来制作。
+（GridLayout与TableLayout的区别：http://www.voidcn.com/blog/zhangfei2018/article/p-4819357.html）
+发现第一个显示的格子比其他格子小，所以只有TableLayout能够满足要求。
+（使用动态添加View到TableRow中）
+
+    遇到的问题：
+    1、必须使用相对应的LayoutParams才能生效
+    例：
+    ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT
+                );
+    TextView textView = new TextView(this);
+    textView.setText("哈哈");
+    //将View添加到TableRow中
+    mTableTitle.addView(textView,params);
+    这是显示不出来TextView的，虽然已经添加到TableRow中。
+
+    正确方式：
+    TableRow.LayoutParams params = new TableRow.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT
+    );//使用View对应的LayoutParams
+
+    2、如何只设置第一列的大小比其他的小。
+    利用TableLayout中的stretchColumns：表示允许哪行被平均分配空间，默认分配空间为View的自身的大小
+
+    3、如何设置边框和分割线(还无法找到更简便的方法设置分割线。)
+    TableLayout本身是无法设置边框的，所以就需要自己设置边框了。
+    ①/个人认为设计边框的几种方法。
+
+    (1)外边框使用<shape>(solid中间透明，stroke设置为边框)对TableRow设置background。，然后使用<View>设置一条线
+    当做表格之间的间隔。（我的做法）  （无法将View设置为单个的layout，）
+
+    (2)对每个表格的View设置background。
+    缺点：相交的部分，就比不相交的部分粗。
+
+    (3)、对每条线使用<View>来设置
+    ②、设置内部的分割线的时候，不显示（希望完成这个项目之后，了解一下原理）
+    (请了解：inflate();参数的原理)
+    View divider = getLayoutInflater().inflate(R.layout.table_divider,null,false);
+    就不显示。因为parent设置为了null。我想原理是如何parent设置为null那么其LayoutParams就
+    无法转换成对应控件的Params(这里就是TableRow的Params)，所以该View就相当于没有Params
+    所以就无法显示。
+    所以正确做法是:null改为TableRow的实例
+    View divider = getLayoutInflater().inflate(R.layout.table_divider,mTableTitle,false);
+    (请了解：include、merge、ViewStub的原理)
+    同样使用<include layout:table_divider/>的时候，也是因为table_divider.xml的Params不
+    与TabRow相同，所以也无法使用。只能这样子，添加TableRow的Params
+    <include android:width="1dp"
+             android:height="match_parent"
+             layout:"@layout/table_divider"/>
+    //马丹，就是将View的layout重写一遍...
+
+    4、如何设置TableLayout中TableRow的高度
+    TableRow的高度的高度总是由该行中最高的view的高度决定的。
+    所以，要设置他的高度，只能设置他子视图。
+
+(3)、制作表格的内容，模仿超级课程表的样子，先制作一个静态图。
+1、先制作课程数（怎么去除上边框）
+2、然后制作Class的Entity。
+3、添加Entity到表中。
+问题：TableLayout如何设置两行。（答案是不能 - -，所以还是应该使用GridLayout，但是我们可以总结下TableLayout
+与GridLayout的优缺点）
+GridLayout:
+可以跨行跨列显示，但是无法自定义行宽和列宽
+并且行数 = 列数
+TableLayout:
+根据View设定行的宽度和列的宽度
+能够自定义行数和列数
+
+总结：使用TableLayout制作失败。
+
+思路：
+首先，肯定不能用LinearLayout或者RelativeLayout将每个包含课程信息的View一个个对应到ViewGroup里，先不说麻烦，布局文件累赘，光是看到一堆的id，头就要大。有种实现方法是将TableLayout作为主布局，然后将每行课表的子View通过addView()添加到TableRow，然后再将每行的TableRow添加到TableLayout中。感觉还是不够直接。所以，最终采用GridLayout作为课表主布局。GridLayout做课表相较于TableLayout有几个天生的优势：
+
+TableLayout不能同时向水平和垂直方向做控件的对齐，而GridLayout可以
+TableLayout不能跨行跨列，而GridLayout可以
+这点尤为重要，比如有些课是包含两节小课，而有些课会连上四节小课，如果课程信息的子View不能跨行的化，处理起来会很笨拙
+这里稍微提一下，有个GridLayout布局，还有个叫GridView的东西。GridView是一种适配器布局,它的继承关系是ViewGroup–>AdapterView–>AbsListView–>GridView，它是从一个adapter中取出内容填充到GridView中的每一个子View。而GridLayout是一个布局，它大大简化了对复杂布局的处理，提高了性能。他直接继承自ViewGroup，和LinearLayout这种是类似的。那什么时候用GridLayout，什么时候用GridView？
+
+当子View布局不一样的时候，就要用GridLayout，因为gridlayout则是一个布局方式，表格里面的子布局想放什么则可以根据自己需要去写，例如Android系统自带的计算器
+当子View的布局是一样的时候，使用GidView，因为gridview的每个子view布局使用的都是一样的，例如九宫格
+为了获得更高的界面自由度，因此使用GridLayout。
+使用GridLayout，先将星期，节次写好后，剩下的课程信息的View通过addView直接添加至对应位置即可
+
+
+
+(三)
+那么重新开始制作：
+头部：使用GridLayout来制作。为什么不用TableLayout呢，因为为了间距和下面的课程内容的间距相同
+GridLayout的使用原理：
+1、首先设置Layout有多少行和多少列。但是这些列并不是平均分配空间的，而是根据你存放的View而
+设置每行占多少，每列占多少。然后当达到最后一列的时候，使用GridLayout.FILL就会将最后一列的
+View占满剩余的控件。还有就是列的空间是根据该列上的View最大空间计算的。
+2、使用GridLayout.Spec设置行列的控件。
+3、所以GridLayout的跨行与跨列，是相对于其他控件的。要有参照物才能体现出跨行的效果。
+比如说，有4列，某个控件跨了两列，表示该行还能放两个控件。还有上一列的两个View的空间，表示
+该View的空间。
+（所以如果使用GridLayout来制作）
+ 在API21之后，GridLayout额外空间的分配可由Weight来决定。如果没有指定weight，则早期的属性会起作用
+
+为了不直接在layout中对星期布局，我们这样制作
+①、获取当前屏幕的大小，分成15分，然后月份则为1分，其他星期为两份。
+②、然后，根据星期，设置View的大小。
+③、利用View设置divider
+
+内容表格的绘制：
+
+课程显示在表格中的绘制
+问题：如何动态改变<Shape>中的背景颜色。
+GradientDrawable drawable = (GradientDrawable) getResources().getDrawable(R.drawable.cls_bg);
+drawable.setColor(Color.RED);
+
+从网站上获取数据
+1、加载OkHttp和Jsoup
+2、设定网络的封装HttpConnection
+3、okHttp reponse乱码。  .aspx不自动跳转的问题
+OkHttp 3.0开始，默认不保存Cookie，要自己使用CookieJar来保存Cookie。
+aspx跟php不同的地方在，php当密码错的时候会返回错误码，但是正方系统只返回原路径
+
+①、封装HttpConnection。创建OkHttp，并设置基础连接参数，和缓存处理（先采用最简单的处理方式）。
+问题：CookieJar的使用(OkHttp会默认将Cookie导入到CookieJar中，默认提取)
+正方系统的Cookie采用的是Session，只要跳转到页面就可以获取Cookie，还不用登陆
+②、研究了教务系统的上传参数之后，创建URLManager用来存放，需要用到的地址
+③、创建Dialog，来执行登陆
+④、创建LoginService，执行登陆的逻辑
+.aspx网站如何操作。
+通过在Request头中添加Referer路径为主路径，然后可以跳转。否则会发生302的跳转问题。
+⑤、解析课表
+⑥、调用数据,并显示
+
+任务二：
+①、改变登陆方式，是先登陆之后，再提取课表
+①、能够利用正则表达式分解课表内容，并设置周数 ()
+①、能够选择不同学期的课表。(PopuWindow的使用，及正方选择学期的问题)
+
+那么首先解析文字，设置成课程名+地方
+
+问题：
+如何删除表中的全部数据，并保留表结构。
+delete()中where设置为Null
+delete(DbHelper.TABLE_STUCLS,null,null);
+
+正则表达式的使用：
+①、元数据
+②、语法
+③、贪婪模式与勉强模式：http://www.cppblog.com/biao/archive/2010/02/05/107298.html
+④、java中的使用语法：http://www.runoob.com/java/java-regular-expressions.html
+⑤、一些常用的字符 http://wangwei007.blog.51cto.com/68019/1108694

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.newbiechen.classscheduledemo.MainActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none">
+        <GridLayout
+            android:id="@+id/main_grid_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:rowCount="13"
+            android:columnCount="8">
+        </GridLayout>
+    </ScrollView>
+    <GridLayout
+        android:id="@+id/main_grid_title"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/table_row_height"
+        android:background="@drawable/table_frame"
+        android:rowCount="1"
+        android:columnCount="15">
+    </GridLayout>
+</FrameLayout>

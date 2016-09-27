@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableRow xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical">
+    <!--显示第几节-->
+    <TextView
+        android:id="@+id/row_class_number"
+        android:layout_width="@dimen/table_first_col_width"
+        android:layout_height="@dimen/table_row_height"
+        android:gravity="center"
+        android:textColor="@color/blue"
+        android:background="@drawable/table_frame"/>
+</TableRow>

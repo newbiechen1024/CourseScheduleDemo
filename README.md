@@ -12,3 +12,7 @@
 [如何制作表格(3)——GridView+RecyclerView](http://blog.csdn.net/chen19960724/article/details/52691726)
 
 2、网络交互中Session的获取和.net动态网站的数据获取
+
+##效果展示图
+
+![](https://github.com/newbiechen1024/CourseScheduleDemo/blob/master/showEffect/CourseScheduleDemo.gif)

@@ -33,7 +33,6 @@ public class CourseParse {
         //查看登陆文档。
         Element element = doc.getElementById("xhxm");
         if (element != null){
-            String name = element.text();
             return true;
         }
         return false;

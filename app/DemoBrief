@@ -144,8 +144,10 @@ aspx跟php不同的地方在，php当密码错的时候会返回错误码，但�
 
 任务二：
 ①、改变登陆方式，是先登陆之后，再提取课表
-①、能够利用正则表达式分解课表内容，并设置周数 ()
+①、能够利用正则表达式分解课表内容，并设置周数 (根据当前周数，利用正则表达式提取)
 ①、能够选择不同学期的课表。(PopuWindow的使用，及正方选择学期的问题)
+(这就不做了，因为之后的原理，跟这个差不多)
+
 
 那么首先解析文字，设置成课程名+地方
 
@@ -160,3 +162,8 @@ delete(DbHelper.TABLE_STUCLS,null,null);
 ③、贪婪模式与勉强模式：http://www.cppblog.com/biao/archive/2010/02/05/107298.html
 ④、java中的使用语法：http://www.runoob.com/java/java-regular-expressions.html
 ⑤、一些常用的字符 http://wangwei007.blog.51cto.com/68019/1108694
+
+总结：
+1、如何制作表格
+2、如何模拟登陆Session、且为aspx的网站。CookieJar的使用
+3、如何使用正则表达式。

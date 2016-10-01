@@ -16,3 +16,5 @@
 ##效果展示图
 
 ![](https://github.com/newbiechen1024/CourseScheduleDemo/blob/master/showEffect/CourseScheduleDemo.gif)
+
+详细思路：[提取学校官网的课程表](http://blog.csdn.net/chen19960724/article/details/52717376)

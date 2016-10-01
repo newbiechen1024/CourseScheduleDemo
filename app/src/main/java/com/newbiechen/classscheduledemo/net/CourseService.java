@@ -3,7 +3,7 @@ package com.newbiechen.classscheduledemo.net;
 import android.os.Handler;
 import android.util.Log;
 
-import com.newbiechen.classscheduledemo.entity.StuClass;
+import com.newbiechen.classscheduledemo.entity.Course;
 import com.newbiechen.classscheduledemo.utils.URLManager;
 
 import java.io.IOException;
@@ -25,9 +25,12 @@ public class CourseService {
     private final Handler mHandler = new Handler();
     private HttpConnection mConnection = HttpConnection.getInstance();
 
-    public <T extends List<StuClass>> void getCourse(String username, final HttpConnection.HttpCallBack<T> callBack) throws IOException {
-        String referer = URLManager.URL_REFERER.replace("XH",username);
+    public <T extends List<Course>> void getCourse(String username, final HttpConnection.HttpCallBack<T> callBack) throws IOException {
+        //因为xh为学号，需要自己设置
         String urlCls = URLManager.URL_CLS.replace("XH",username);
+        //重点：因为该网站实现的是动态跳转（有没有发现跳转到课表页面，但是网址没有变化）
+        //必须添加Referer到Http头，Referer指的是当前页面的网址，否则会拒绝访问
+        String referer = URLManager.URL_REFERER.replace("XH",username);
         Log.d(TAG,urlCls);
         URL url = new URL(urlCls);
         Request.Builder builder = new Request.Builder();

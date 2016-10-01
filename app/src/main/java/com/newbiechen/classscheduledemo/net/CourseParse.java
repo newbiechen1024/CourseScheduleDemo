@@ -1,12 +1,7 @@
 package com.newbiechen.classscheduledemo.net;
 
-import android.content.Context;
-import android.nfc.Tag;
-import android.os.PatternMatcher;
-import android.util.Log;
-
 import com.newbiechen.classscheduledemo.R;
-import com.newbiechen.classscheduledemo.entity.StuClass;
+import com.newbiechen.classscheduledemo.entity.Course;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -39,8 +34,8 @@ public class CourseParse {
     }
 
     /*解析个人课表*/
-    public static List<StuClass> parsePersonal(String data){
-        List<StuClass> stuClasses = new ArrayList<>();
+    public static List<Course> parsePersonal(String data){
+        List<Course> courses = new ArrayList<>();
         Document doc = Jsoup.parse(data);
         //首先获取Table
         Element table = doc.getElementById("Table1");
@@ -62,19 +57,19 @@ public class CourseParse {
                 if (str.length() != 1){
                     //解析文本数据
                     str = parsePersonalCourse(str);
-                    StuClass stuClass = new StuClass();
-                    stuClass.setClsName(str);
-                    stuClass.setDay(j+1);
-                    stuClass.setClsCount(Integer.valueOf(td.attr("rowspan")));
-                    stuClass.setClsNum(i+1);
+                    Course course = new Course();
+                    course.setClsName(str);
+                    course.setDay(j+1);
+                    course.setClsCount(Integer.valueOf(td.attr("rowspan")));
+                    course.setClsNum(i+1);
                     Random random = new Random();
                     int num = random.nextInt(COLOR.length);
-                    stuClass.setColor(COLOR[num]);
-                    stuClasses.add(stuClass);
+                    course.setColor(COLOR[num]);
+                    courses.add(course);
                 }
             }
         }
-        return stuClasses;
+        return courses;
     }
 
     private static String parsePersonalCourse(String text){

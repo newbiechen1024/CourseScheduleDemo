@@ -2,8 +2,9 @@ package com.newbiechen.classscheduledemo.entity;
 
 /**
  * Created by PC on 2016/9/23.
+ *
  */
-public class StuClass {
+public class Course {
     //星期几:周一到周日
     private int day;
     //第几节课：总共12节

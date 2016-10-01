@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import com.newbiechen.classscheduledemo.utils.URLManager;
@@ -26,7 +27,7 @@ import okhttp3.Response;
 public class LoginService {
     public static final String TAG = "LoginService";
 
-    private final Handler mHandler = new Handler();
+    private final Handler mHandler = new Handler(Looper.getMainLooper());
     private Context mContext;
     //设置登陆的Post参数
     private String rudioButton = "学生";
@@ -43,6 +44,12 @@ public class LoginService {
     }
 
     //获取验证码
+
+    /**
+     * 获取验证码的时候，会返回给客户端一个Cookie
+     * 作用：获取验证码
+     * @param httpCallBack
+     */
     public <T extends Bitmap> void getCodesImg(final HttpConnection.HttpCallBack<T> httpCallBack) throws IOException{
         URL codeUrl = new URL(URLManager.URL_CODES);
         final Request request = new Request.Builder()
@@ -57,7 +64,7 @@ public class LoginService {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()){
-                    //用流优化收到数据比较大
+                    //用流优化当收到的数据比较大
                     byte [] bytes = response.body().bytes();
                     ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
                     final Bitmap bitmap =  BitmapFactory.decodeStream(bais);
@@ -114,7 +121,7 @@ public class LoginService {
         mConnection.connectUrl(request,callback);
     }
 
-    private <T>void changeEnvironment(final HttpConnection.HttpCallBack httpCallBack, final T data){
+    private <T> void changeEnvironment(final HttpConnection.HttpCallBack httpCallBack, final T data){
         mHandler.post(new Runnable() {
             @Override
             public void run() {

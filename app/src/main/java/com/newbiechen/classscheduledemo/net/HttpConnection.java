@@ -15,6 +15,7 @@ import okhttp3.Callback;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.HttpUrl;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -44,6 +45,10 @@ public class HttpConnection {
     }
 
     /*存储Cookie的类*/
+
+    /**
+     * 由于网站不能够持久化登陆，就直接将Cookie值放在HashMap中了
+     */
     class MyCookieJar implements CookieJar{
         @Override
         public void saveFromResponse(HttpUrl url, List<Cookie> cookies) {

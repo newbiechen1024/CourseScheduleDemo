@@ -6,7 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.newbiechen.classscheduledemo.database.DbHelper;
-import com.newbiechen.classscheduledemo.entity.StuClass;
+import com.newbiechen.classscheduledemo.entity.Course;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,47 +32,47 @@ public class StuCourseDao {
         return sStuCourseDao;
     }
 
-    public void saveStuCls(StuClass stuClass){
+    public void saveStuCls(Course course){
         ContentValues values = new ContentValues();
-        values.put(DbHelper.STUCLS_NAME_COL,stuClass.getClsName());
-        values.put(DbHelper.STUCLS_DAY_COL,stuClass.getDay());
-        values.put(DbHelper.STUCLS_NUM_COL,stuClass.getClsNum());
-        values.put(DbHelper.STUCLS_COUNT_COL,stuClass.getClsCount());
-        values.put(DbHelper.STUCLS_COLOR_COL,stuClass.getColor());
+        values.put(DbHelper.STUCLS_NAME_COL, course.getClsName());
+        values.put(DbHelper.STUCLS_DAY_COL, course.getDay());
+        values.put(DbHelper.STUCLS_NUM_COL, course.getClsNum());
+        values.put(DbHelper.STUCLS_COUNT_COL, course.getClsCount());
+        values.put(DbHelper.STUCLS_COLOR_COL, course.getColor());
         //当相同的时候替换。
         mDataBase.insertWithOnConflict(DbHelper.TABLE_STUCLS,null,values,SQLiteDatabase.CONFLICT_REPLACE);
     }
 
-    public void saveStuClsList(List<StuClass> stuClasses){
-        for (StuClass stuClass : stuClasses){
-            saveStuCls(stuClass);
+    public void saveStuClsList(List<Course> courses){
+        for (Course course : courses){
+            saveStuCls(course);
         }
     }
 
-    public List<StuClass> getStuClsList(){
-        List<StuClass> stuClasses = new ArrayList<>();
+    public List<Course> getStuClsList(){
+        List<Course> courses = new ArrayList<>();
         Cursor cursor = mDataBase.rawQuery("select * from "+DbHelper.TABLE_STUCLS,null);
         while (cursor.moveToNext()){
-            StuClass stuClass = new StuClass();
-            stuClass.setClsName(cursor.getString(
+            Course course = new Course();
+            course.setClsName(cursor.getString(
                     cursor.getColumnIndex(DbHelper.STUCLS_NAME_COL))
             );
-            stuClass.setClsNum(cursor.getInt(
+            course.setClsNum(cursor.getInt(
                     cursor.getColumnIndex(DbHelper.STUCLS_NUM_COL)
             ));
-            stuClass.setDay(cursor.getInt(
+            course.setDay(cursor.getInt(
                     cursor.getColumnIndex(DbHelper.STUCLS_DAY_COL)
             ));
-            stuClass.setClsCount(cursor.getInt(
+            course.setClsCount(cursor.getInt(
                     cursor.getColumnIndex(DbHelper.STUCLS_COUNT_COL)
             ));
-            stuClass.setColor(cursor.getInt(
+            course.setColor(cursor.getInt(
                     cursor.getColumnIndex(DbHelper.STUCLS_COLOR_COL)
             ));
-            stuClasses.add(stuClass);
+            courses.add(course);
         }
         cursor.close();
-        return stuClasses;
+        return courses;
     }
 
     public void removeAll(){

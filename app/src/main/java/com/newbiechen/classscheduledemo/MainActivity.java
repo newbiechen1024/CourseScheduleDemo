@@ -1,11 +1,9 @@
 package com.newbiechen.classscheduledemo;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,7 +15,7 @@ import com.newbiechen.androidlib.base.BaseActivity;
 import com.newbiechen.androidlib.utils.ToastUtils;
 import com.newbiechen.classscheduledemo.activity.LoginActivity;
 import com.newbiechen.classscheduledemo.database.dao.StuCourseDao;
-import com.newbiechen.classscheduledemo.entity.StuClass;
+import com.newbiechen.classscheduledemo.entity.Course;
 import com.newbiechen.classscheduledemo.net.CourseService;
 import com.newbiechen.classscheduledemo.net.HttpConnection;
 import com.newbiechen.classscheduledemo.utils.SharePreferenceUntil;
@@ -32,7 +30,7 @@ public class MainActivity extends BaseActivity {
     private static final String [] TITLE_DATA = {"9月","周一","周二","周三","周四","周五","周六","周日"};
     private static final int GRID_ROW_COUNT = 12;
     private static final int GRID_COL_COUNT = 8;
-    private List<StuClass> mStuCourseList = new ArrayList<>();
+    private List<Course> mStuCourseList = new ArrayList<>();
     private CourseService mCourseService;
     private StuCourseDao mStuCourseDao;
     private GridLayout mGlClsTitle;
@@ -56,7 +54,7 @@ public class MainActivity extends BaseActivity {
         setUpClsContent();
 
     }
-    //设置表格显示星期的地方(问，能否使用merge)
+    //设置表格显示星期的地方
     private void setUpClsTitle(){
         for (int i=0; i<TITLE_DATA.length; ++i){
             String content = TITLE_DATA[i];
@@ -90,8 +88,12 @@ public class MainActivity extends BaseActivity {
                     GridLayout.spec(row),GridLayout.spec(col)
             );
             params.width = mTableDistance;
-            params.height = (int) getResources().getDimension(R.dimen.table_row_height);
-
+            if (i == 0){
+                params.height = 0;
+            }
+            else {
+                params.height = (int) getResources().getDimension(R.dimen.table_row_height);
+            }
             TextView textView = new TextView(this);
             textView.setTextColor(getResources().getColor(R.color.blue));
             textView.setText(i+"");
@@ -107,7 +109,7 @@ public class MainActivity extends BaseActivity {
                     GridLayout.spec(row),GridLayout.spec(col)
             );
             params.width = mTableDistance*2;
-            params.height = (int) getResources().getDimension(R.dimen.table_row_height);
+            params.height = 0;
 
             View view = new View(this);
             mGlClsContent.addView(view,params);
@@ -116,25 +118,29 @@ public class MainActivity extends BaseActivity {
 
     private void showCls(){
         for (int i = 0; i< mStuCourseList.size(); ++i){
-            StuClass stuClass = mStuCourseList.get(i);
-            int row = stuClass.getClsNum();
-            int col = stuClass.getDay();
-            int size = stuClass.getClsCount();
+            Course course = mStuCourseList.get(i);
+            int row = course.getClsNum();
+            int col = course.getDay();
+            int size = course.getClsCount();
+            //设定View在表格的哪行那列
             GridLayout.LayoutParams params = new GridLayout.LayoutParams(
                     GridLayout.spec(row,size),
                     GridLayout.spec(col)
             );
-            params.setGravity(Gravity.FILL);
+            //设置View的宽高
             params.width = mTableDistance*2;
-            params.height = mTableDistance * size;
-            //代码中改变<Shape>的背景颜色
+            params.height = (int) getResources().getDimension(R.dimen.table_row_height) * size;
+            params.setGravity(Gravity.FILL);
+            //通过代码改变<Shape>的背景颜色
             GradientDrawable drawable = (GradientDrawable) getResources().getDrawable(R.drawable.cls_bg);
-            drawable.setColor(getResources().getColor(stuClass.getColor()));
+            drawable.setColor(getResources().getColor(course.getColor()));
+            //设置View
             TextView textView = new TextView(this);
             textView.setTextColor(getResources().getColor(R.color.white));
-            textView.setText(stuClass.getClsName());
+            textView.setText(course.getClsName());
             textView.setGravity(Gravity.CENTER);
             textView.setBackground(drawable);
+            //添加到表格中
             mGlClsContent.addView(textView,params);
         }
     }
@@ -147,8 +153,8 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void processLogin(Bundle savedInstanceState) {
         //首先从数据库获取值
-        List<StuClass> stuClasses = mStuCourseDao.getStuClsList();
-        mStuCourseList.addAll(stuClasses);
+        List<Course> courses = mStuCourseDao.getStuClsList();
+        mStuCourseList.addAll(courses);
         showCls();
 
 
@@ -184,9 +190,9 @@ public class MainActivity extends BaseActivity {
                         dialog.show();
                         //加载数据
                         mCourseService.getCourse(SharePreferenceUntil.loadDataFromFile(SharePreferenceUntil.KEY_USERNAME),
-                                new HttpConnection.HttpCallBack<List<StuClass>>() {
+                                new HttpConnection.HttpCallBack<List<Course>>() {
                             @Override
-                            public void callback(List<StuClass> data) {
+                            public void callback(List<Course> data) {
                                 //清空原有数据
                                 mStuCourseList.clear();
                                 mStuCourseDao.removeAll();
